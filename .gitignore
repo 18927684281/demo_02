@@ -52,8 +52,11 @@ coverage.xml
 
 # Django stuff:
 *.log
-local_settings.py
+# local_settings.py
 settings.py
+medias/
+settings/
+
 
 # Flask stuff:
 instance/
@@ -107,3 +110,7 @@ ENV/
 # sqlite3
 *.sqlite3
 *.db
+
+# etags
+TAGS
+TAGS_*
