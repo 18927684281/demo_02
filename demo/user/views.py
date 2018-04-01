@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect
 from django.core.exceptions import ObjectDoesNotExist
 
 from .models import User
+from .helper import check_perm
 
 
 def register_user(request):
@@ -48,6 +49,7 @@ def register_user(request):
         return render(request, tpl_name, info)
 
 
+@check_perm('admin')
 def info_user(request):
     ''' 显示用户信息 '''
     uid = request.session['uid']
