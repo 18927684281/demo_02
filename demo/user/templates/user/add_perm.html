@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block container %}
+<form method='POST' action='/user/add_perm/'>
+    {% csrf_token %}
+
+    {% if error %}
+        <div>
+            错误：{{ error }}
+        </div>
+        <hr>
+    {% endif %}
+
+    <div>
+        <label>用户：</label>
+        {% for user in users %}
+            <div>
+                <input name='uid' type='radio' value='{{ user.id }}'>
+                {{ user.id }} - {{ user.nickname }}
+            </div>
+        {% endfor %}
+    </div>
+
+    <div>
+        <label>权限：</label>
+        {% for perm in perms %}
+            <div>
+                <input name='perm_id' type='radio' value='{{ perm.id }}'>
+                {{ perm.id }} - {{ perm.name }}
+            </div>
+        {% endfor %}
+    </div>
+
+    <div>
+        <button type="subit">提交</button>
+    </div>
+</form>
+{% endblock %}

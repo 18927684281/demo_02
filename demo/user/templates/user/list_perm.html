@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block container %}
+<form method='POST' action='/user/login/'>
+    {% csrf_token %}
+
+    {% if error %}
+        <div>
+            错误：{{ error }}
+        </div>
+        <hr>
+    {% endif %}
+
+    {% if user %}
+        <div>
+            <label>用户：</label>
+            <ul>
+                <li>{{ user.id }} - {{ user.nickname }}</li>
+            </ul>
+        </div>
+        <hr>
+    {% endif %}
+
+    {% if perms %}
+        <div>
+            <label>权限：</label>
+            <ul>
+                {% for perm in perms %}
+                    <li>{{ perm.id }} - {{ perm.name }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
+</form>
+{% endblock %}
