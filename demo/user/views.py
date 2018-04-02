@@ -1,3 +1,6 @@
+from collections import defaultdict
+import pprint
+
 from django.shortcuts import render, redirect
 # from django.core.exceptions import ObjectDoesNotExist
 
@@ -111,7 +114,6 @@ def add_perm(request):
         info['users'] = User.objects.all()
     if 'perms' not in info:
         info['perms'] = Permission.objects.all()
-    pass
     return render(request, tpl_name, info)
 
 
@@ -133,4 +135,34 @@ def list_perm(request):
         info['perms'] = perms
     else:
         info['error'] = '用户(id={})不存在'.format(uid)
+    return render(request, tpl_name, info)
+
+
+def del_perm(request):
+    ''' 删除权限 '''
+    info = {}
+    try:
+        uid = int(request.GET.get('uid', 0))
+        user = User.objects.get(pk=uid)
+        if request.method == 'POST':
+            # 用户提交
+            pass
+
+        arr_role_id = Role.objects.filter(uid=uid).values_list(
+                'perm_id', flat=True,
+                )
+        print('arr_role_id: {}'.format(arr_role_id))
+        perms = Permission.objects.filter(id__in=arr_role_id).all()
+        print('perms: {}'.format(perms))
+        if 'user' not in info:
+            info['user'] = user
+        if 'perms' not in info:
+            info['perms'] = perms
+        if 'all_perms' not in info:
+            info['all_perms'] = Permission.objects.all()
+    except Exception as e:
+        info['error'] = str(e)
+    tpl_name = 'user/del_perm.html'
+    print('info:')
+    pprint.pprint(info)
     return render(request, tpl_name, info)
