@@ -1,4 +1,3 @@
-from collections import defaultdict
 import json
 
 from django.shortcuts import render, redirect
@@ -10,6 +9,7 @@ from .helper import check_perm
 
 def register_user(request):
     ''' 用户注册 '''
+    tpl_name = 'user/register.html'
     if request.method == 'POST':
         # 保存注册数据
         nickname = request.POST.get('nickname')
@@ -17,7 +17,6 @@ def register_user(request):
             # "昵称"存在
             info = {'error': '"昵称"存在'}
             # 显示注册页面
-            tpl_name = 'user/register.html'
             return render(request, tpl_name, info)
 
         password = request.POST.get('password')
@@ -26,7 +25,6 @@ def register_user(request):
             # 2次密码不一致
             info = {'error': '2次密码不一致'}
             # 显示注册页面
-            tpl_name = 'user/register.html'
             return render(request, tpl_name, info)
 
         age = request.POST.get('age')
@@ -47,8 +45,6 @@ def register_user(request):
         return redirect(url)
     else:
         # 显示注册页面
-        tpl_name = 'user/register.html'
-        info = {'error': 'test'}
         return render(request, tpl_name, info)
 
 
@@ -192,4 +188,35 @@ def del_perm(request):
 
 def edit_user(request):
     ''' 修改用户信息 '''
-    pass
+    info = {}
+    arr_error = []
+    if request.method == 'POST':
+        try:
+            # 用户提交
+            uid = int(request.POST.get('uid', 0))
+            f_in = request.FILES.get('icon')
+            age = int(request.POST.get('age', 0))
+            sex = int(request.POST.get('sex', 0))
+            user = User.objects.get(pk=uid)
+            user.age = age
+            user.sex = sex
+            if f_in:
+                user.icon.save(f_in.name, f_in, save=False)
+            user.save()
+            # 跳转到用户信息
+            url = '/user/read_user/?uid={}'.format(user.id)
+            return redirect(url)
+        except Exception as e:
+            arr_error.append(str(e))
+    # 显示"修改用户信息"的界面
+    if 'user' not in info:
+        try:
+            uid = int(request.GET.get('uid', 0))
+            user = User.objects.get(pk=uid)
+            info['user'] = user
+        except Exception as e:
+            arr_error.append(str(e))
+    if arr_error:
+        info['error'] = json.dumps(arr_error)
+    tpl_name = 'user/edit_user.html'
+    return render(request, tpl_name, info)

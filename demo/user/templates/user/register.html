@@ -24,7 +24,11 @@
     </div>
     <div>
         <label>头像</label>
-        <input name='icon' type='file' value='{{ icon }}'>
+        {% if user.icon %}
+            <img src='{{ user.icon.url }}' height='60px' width='60px'>
+            <label>更改<label>
+        {% endif %}
+        <input name='icon' type='file'>
     </div>
     <div>
         <label>年龄</label>

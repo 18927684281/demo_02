@@ -15,9 +15,9 @@
         <div>
             <label>用户：</label>
             <div>
-                <input name='uid' type='hidden' value='{{ user.id }}' selected>
                 {{ user.id }} - {{ user.nickname }}
             </div>
+            <input name='uid' type='hidden' value='{{ user.id }}'>
         </div>
         <hr>
     {% endif %}
