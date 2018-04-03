@@ -5,7 +5,7 @@ from . import views
 
 urlpatterns = [
     # 用户信息
-    path(r'register/', views.register_user),
+    path(r'add_user/', views.add_user),
     path(r'read_user/', views.read_user),
     path(r'edit_user/', views.edit_user),
     path(r'del_user/', views.del_user),

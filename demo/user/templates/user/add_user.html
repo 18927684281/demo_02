@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 
 {% block container %}
-<form method='POST' action='/user/register/' enctype='multipart/form-data'>
+<form method='POST' action='/user/add_user/' enctype='multipart/form-data'>
     {% csrf_token %}
 
     {% if error %}

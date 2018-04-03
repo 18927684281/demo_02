@@ -7,10 +7,10 @@ from .models import Permission, Role, User
 from .helper import check_perm
 
 
-def register_user(request):
+def add_user(request):
     ''' 用户注册 '''
     info = {}
-    tpl_name = 'user/register.html'
+    tpl_name = 'user/add_user.html'
     if request.method == 'POST':
         # 保存注册数据
         nickname = request.POST.get('nickname')
