@@ -267,3 +267,106 @@ def del_user(request):
         info['error'] = json.dumps(arr_error)
     tpl_name = 'user/del_user.html'
     return render(request, tpl_name, info)
+
+
+def add_permission(request):
+    ''' 权限名称的增加 '''
+    info = {}
+    tpl_name = 'user/add_permission.html'
+    if request.method == 'POST':
+        # 保存提交数据
+        name = request.POST.get('name')
+        if Permission.objects.filter(name__exact=name).exists():
+            # 名称存在
+            info = {'error': '"名称"存在'}
+            return render(request, tpl_name, info)
+        perm = Permission.objects.create(name=name)
+        # 跳转到权限信息
+        url = '/user/read_permission/?perm_id={}'.format(perm.id)
+        return redirect(url)
+    else:
+        # 显示权限名称页面
+        return render(request, tpl_name, info)
+
+
+def read_permission(request):
+    ''' 显示权限名称信息 '''
+    info = {}
+    tpl_name = 'user/read_permission.html'
+    perm_id = int(request.GET.get('perm_id', 0))
+    try:
+        perm = Permission.objects.get(pk=perm_id)
+        info['perm'] = perm
+    except Exception:
+        info['error'] = '权限名称不存在'
+    return render(request, tpl_name, info)
+
+
+def edit_permission(request):
+    ''' 修改权限名称信息 '''
+    info = {'perm': None}
+    arr_error = []
+    tpl_name = 'user/edit_permission.html'
+    if request.method == 'POST':
+        try:
+            # 用户提交
+            name = request.POST.get('name')
+            print('name: {}'.format(name))
+            if Permission.objects.filter(name=name).exists():
+                # "权限名称"存在
+                info = {'error': '"名称"存在'}
+                return render(request, tpl_name, info)
+            perm_id = int(request.POST.get('perm_id', 0))
+            print('perm_id: {}'.format(perm_id))
+            perm = Permission.objects.get(pk=perm_id)
+            perm.name = name
+            perm.save()
+            # 跳转到权限名称信息
+            url = '/user/read_permission/?perm_id={}'.format(perm.id)
+            return redirect(url)
+        except Exception as e:
+            arr_error.append(str(e))
+    # 显示"修改权限名称信息"的界面
+    if info['perm'] is None:
+        try:
+            perm_id = int(request.GET.get('perm_id', 0))
+            perm = Permission.objects.get(pk=perm_id)
+            info['perm'] = perm
+        except ObjectDoesNotExist:
+            arr_error.append('记录不存在')
+        except Exception as e:
+            arr_error.append(str(e))
+    if arr_error:
+        info['error'] = json.dumps(arr_error, ensure_ascii=False)
+    return render(request, tpl_name, info)
+
+
+def list_permission(request):
+    ''' 显示权限名称的列表 '''
+    tpl_name = 'user/list_permission.html'
+    perms = Permission.objects.all()
+    info = {'perms': perms}
+    return render(request, tpl_name, info)
+
+
+def del_permission(request):
+    ''' 删除权限名称 '''
+    info = {}
+    arr_error = []
+    perm_id = None
+    if request.method == 'POST':
+        try:
+            # 用户提交
+            perm_id = int(request.POST.get('perm_id', 0))
+            Permission.objects.filter(pk=perm_id).delete()
+            return redirect('/user/list_permission/')
+        except Exception as e:
+            arr_error.append(str(e))
+    try:
+        perms = Permission.objects.all()
+        if 'perms' not in info:
+            info['perms'] = perms
+    except Exception as e:
+        arr_error.append(str(e))
+    tpl_name = 'user/del_permission.html'
+    return render(request, tpl_name, info)

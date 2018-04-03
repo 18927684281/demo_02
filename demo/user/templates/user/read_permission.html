@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% block container %}
+    {% if error %}
+        <div>
+            错误：{{ error }}
+        </div>
+        <hr>
+    {% endif %}
+
+    {% if user %}
+        <div>
+            <label>id：</label>
+            {{ perm.id }}
+        </div>
+        <div>
+            <label>名称：</label>
+            {{ perm.name }}
+        </div>
+    {% endif %}
+{% endblock %}
