@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block container %}
+<form method='POST' action='/user/del_user/'>
+    {% csrf_token %}
+
+    {% if error %}
+        <div>
+            错误：{{ error }}
+        </div>
+        <hr>
+    {% endif %}
+
+    <div>
+        <label>用户：</label>
+        <div>
+            {% for user in users %}
+                <input name='uid' type='checkbox' value='{{ user.id }}'>
+                {{ user.id }} - {{ user.nickname }}
+                <br>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div>
+        <button type="subit">提交</button>
+    </div>
+</form>
+{% endblock %}

@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% block container %}
+    {% if error %}
+        <div>
+            错误：{{ error }}
+        </div>
+        <hr>
+    {% endif %}
+
+    {% if user %}
+        <div>
+            <label>昵称：</label>
+            {{ user.nickname }}
+        </div>
+        <div>
+            <label>头像：</label>
+            <img src="{{ user.icon.url }}" height="60px" width="60px">
+        </div>
+        <div>
+            <label>年龄：</label>
+            {{ user.age }}
+        </div>
+        <div>
+            <label>性别：</label>
+            {{ user.sex }}
+        </div>
+    {% endif %}
+{% endblock %}
