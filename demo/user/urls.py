@@ -9,7 +9,7 @@ urlpatterns = [
     path(r'read_user/', views.read_user),
     path(r'edit_user/', views.edit_user),
     # path(r'del_user/', views.del_user),
-    # path(r'list_user/', views.list_user),
+    path(r'list_user/', views.list_user),
 
     # 系统登录、登出
     path(r'login/', views.login),

@@ -220,3 +220,11 @@ def edit_user(request):
         info['error'] = json.dumps(arr_error)
     tpl_name = 'user/edit_user.html'
     return render(request, tpl_name, info)
+
+
+def list_user(request):
+    ''' 显示用户列表 '''
+    tpl_name = 'user/list_user.html'
+    users = User.objects.all()
+    info = {'users': users}
+    return render(request, tpl_name, info)

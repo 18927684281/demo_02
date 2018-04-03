@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block container %}
+    {% if error %}
+        <div>
+            错误：{{ error }}
+        </div>
+        <hr>
+    {% endif %}
+
+    {% if users %}
+        <div>
+            <table border='1'>
+                <tr>
+                    <th>id</th>
+                    <th>昵称</th>
+                    <th>头像</th>
+                    <th>年龄</th>
+                    <th>性别</th>
+                </tr>
+                {% for user in users %}
+                    <tr>
+                        <th>{{ user.id }}</th>
+                        <th>{{ user.nickname }}</th>
+                        <th>
+                            <img src='{{ user.icon.url }}' height='60px'
+                                    width='60px'>
+                        </th>
+                        <th>{{ user.age }}</th>
+                        <th>{{ user.sex }}</th>
+                    </tr>
+                {% endfor %}
+            </table>
+        </div>
+    {% endif %}
+{% endblock %}
