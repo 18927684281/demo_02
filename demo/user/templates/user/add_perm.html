@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block container %}
+<form method='POST' action='/user/add_perm/'>
+    {% csrf_token %}
+
+    {% if error %}
+        <div>
+            错误：{{ error }}
+        </div>
+        <hr>
+    {% endif %}
+
+    {% if user %}
+        <div>
+            <label>用户：</label>
+            <div>
+                {{ user.id }} - {{ user.nickname }}
+            </div>
+            <input name='uid' type='hidden' value='{{ user.id }}'>
+        </div>
+        <hr>
+    {% endif %}
+
+    {% if all_perms %}
+        <div>
+            <label>权限：</label>
+            <div>
+                {% for perm in all_perms %}
+                    <input name='perm_id' type='checkbox'
+                            value='{{ perm.id }}'
+                            {% if perm in perms %}
+                                checked
+                            {% endif %}
+                            >
+                    {{ perm.id }} - {{ perm.name }}
+                    <br>
+                {% endfor %}
+            </div>
+        </div>
+    {% endif %}
+
+    <div>
+        <button type="subit">提交</button>
+    </div>
+</form>
+{% endblock %}
