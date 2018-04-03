@@ -15,8 +15,10 @@ urlpatterns = [
     path(r'login/', views.login),
     path(r'logout/', views.logout),
 
-    # 用户权限
-    path(r'add_perm/', views.add_perm),
-    path(r'list_perm/', views.list_perm),
-    path(r'del_perm/', views.del_perm),
+    # 用户的权限
+    path(r'add_user_perm/', views.add_user_perm),
+    path(r'list_user_perm/', views.list_user_perm),
+    path(r'del_user_perm/', views.del_user_perm),
+
+    # 权限
 ]

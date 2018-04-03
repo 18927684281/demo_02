@@ -3,7 +3,7 @@ import json
 from django.shortcuts import render, redirect
 from django.core.exceptions import ObjectDoesNotExist
 
-from .models import Permission, Role, User
+from .models import Permission, User, UserPermission
 from .helper import check_perm
 
 
@@ -94,7 +94,7 @@ def logout(request):
 
 
 @check_perm('admin')
-def add_perm(request):
+def add_user_perm(request):
     ''' 增加权限 '''
     info = {
             'user': None,
@@ -109,8 +109,8 @@ def add_perm(request):
             s_id_perm = request.POST.getlist('perm_id')
             arr_id_perm = [int(s) for s in s_id_perm]
             for perm_id in arr_id_perm:
-                Role.objects.get_or_create(uid=uid, perm_id=perm_id)
-            return redirect('/user/list_perm/?uid={}'.format(uid))
+                UserPermission.objects.get_or_create(uid=uid, perm_id=perm_id)
+            return redirect('/user/list_user_perm/?uid={}'.format(uid))
         except ObjectDoesNotExist:
             arr_error.append('记录不存在')
         except Exception as e:
@@ -119,10 +119,10 @@ def add_perm(request):
     try:
         uid = int(request.GET.get('uid', 0))
         user = User.objects.get(pk=uid)
-        arr_role_id = Role.objects.filter(uid=uid).values_list(
+        arr_perm_id = UserPermission.objects.filter(uid=uid).values_list(
                 'perm_id', flat=True,
                 )
-        perms = Permission.objects.filter(id__in=arr_role_id).all()
+        perms = Permission.objects.filter(id__in=arr_perm_id).all()
         if info['user'] is None:
             info['user'] = user
         if info['perms'] is None:
@@ -135,24 +135,26 @@ def add_perm(request):
         arr_error.append(str(e))
     if arr_error:
         info['error'] = json.dumps(arr_error, ensure_ascii=False)
-    tpl_name = 'user/add_perm.html'
+    tpl_name = 'user/add_user_perm.html'
     print('info: {}'.format(info))
     return render(request, tpl_name, info)
 
 
-def list_perm(request):
+def list_user_perm(request):
     ''' 显示指定用户的权限 '''
     info = {
             'user': None,
             'perms': None,
             }
-    tpl_name = 'user/list_perm.html'
+    tpl_name = 'user/list_user_perm.html'
     uid = int(request.GET.get('uid', 0))
     user = User.objects.filter(pk=uid).first()
     if user:
         info['user'] = user
         arr_id_perm = tuple(
-                Role.objects.filter(uid=uid).values_list('perm_id', flat=True)
+                UserPermission.objects.filter(uid=uid).values_list(
+                    'perm_id', flat=True
+                    )
                 )
         perms = Permission.objects.filter(id__in=arr_id_perm).all()
         info['perms'] = perms
@@ -161,7 +163,7 @@ def list_perm(request):
     return render(request, tpl_name, info)
 
 
-def del_perm(request):
+def del_user_perm(request):
     ''' 删除权限 '''
     info = {}
     arr_error = []
@@ -172,18 +174,20 @@ def del_perm(request):
             uid = int(request.POST.get('uid', 0))
             s_id_perm = request.POST.getlist('perm_id')
             arr_id_perm = [int(s) for s in s_id_perm]
-            Role.objects.filter(uid=uid, perm_id__in=arr_id_perm).delete()
-            return redirect('/user/list_perm/?uid={}'.format(uid))
+            UserPermission.objects.filter(
+                    uid=uid, perm_id__in=arr_id_perm
+                    ).delete()
+            return redirect('/user/list_user_perm/?uid={}'.format(uid))
     except Exception as e:
         arr_error.append(str(e))
     try:
         if uid is None:
             uid = int(request.GET.get('uid', 0))
         user = User.objects.get(pk=uid)
-        arr_role_id = Role.objects.filter(uid=uid).values_list(
+        arr_id_perm = UserPermission.objects.filter(uid=uid).values_list(
                 'perm_id', flat=True,
                 )
-        perms = Permission.objects.filter(id__in=arr_role_id).all()
+        perms = Permission.objects.filter(id__in=arr_id_perm).all()
         if 'user' not in info:
             info['user'] = user
         if 'perms' not in info:
@@ -194,7 +198,7 @@ def del_perm(request):
         arr_error.append(str(e))
     if arr_error:
         info['error'] = json.dumps(arr_error)
-    tpl_name = 'user/del_perm.html'
+    tpl_name = 'user/del_user_perm.html'
     return render(request, tpl_name, info)
 
 
