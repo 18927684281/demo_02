@@ -1,7 +1,7 @@
 import json
 
 from django.shortcuts import render, redirect
-# from django.core.exceptions import ObjectDoesNotExist
+from django.core.exceptions import ObjectDoesNotExist
 
 from .models import Permission, Role, User
 from .helper import check_perm
@@ -9,6 +9,7 @@ from .helper import check_perm
 
 def register_user(request):
     ''' 用户注册 '''
+    info = {}
     tpl_name = 'user/register.html'
     if request.method == 'POST':
         # 保存注册数据
@@ -95,19 +96,25 @@ def logout(request):
 @check_perm('admin')
 def add_perm(request):
     ''' 增加权限 '''
-    info = {}
+    info = {
+            'user': None,
+            'perms': None,
+            'all_perms': None,
+            }
     arr_error = []
-    try:
-        if request.method == 'POST':
-            # 用户提交
+    if request.method == 'POST':
+        # 用户提交
+        try:
             uid = int(request.POST.get('uid', 0))
             s_id_perm = request.POST.getlist('perm_id')
             arr_id_perm = [int(s) for s in s_id_perm]
             for perm_id in arr_id_perm:
                 Role.objects.get_or_create(uid=uid, perm_id=perm_id)
             return redirect('/user/list_perm/?uid={}'.format(uid))
-    except Exception as e:
-        arr_error.append(str(e))
+        except ObjectDoesNotExist:
+            arr_error.append('记录不存在')
+        except Exception as e:
+            arr_error.append(str(e))
     # 显示"增加权限"的界面
     try:
         uid = int(request.GET.get('uid', 0))
@@ -116,17 +123,20 @@ def add_perm(request):
                 'perm_id', flat=True,
                 )
         perms = Permission.objects.filter(id__in=arr_role_id).all()
-        if 'user' not in info:
+        if info['user'] is None:
             info['user'] = user
-        if 'perms' not in info:
+        if info['perms'] is None:
             info['perms'] = perms
-        if 'all_perms' not in info:
+        if info['all_perms'] is None:
             info['all_perms'] = Permission.objects.all()
+    except ObjectDoesNotExist:
+        arr_error.append('记录不存在')
     except Exception as e:
         arr_error.append(str(e))
     if arr_error:
-        info['error'] = json.dumps(arr_error)
+        info['error'] = json.dumps(arr_error, ensure_ascii=False)
     tpl_name = 'user/add_perm.html'
+    print('info: {}'.format(info))
     return render(request, tpl_name, info)
 
 
@@ -190,7 +200,7 @@ def del_perm(request):
 
 def edit_user(request):
     ''' 修改用户信息 '''
-    info = {}
+    info = {'user': None}
     arr_error = []
     if request.method == 'POST':
         try:
@@ -211,15 +221,17 @@ def edit_user(request):
         except Exception as e:
             arr_error.append(str(e))
     # 显示"修改用户信息"的界面
-    if 'user' not in info:
+    if info['user'] is None:
         try:
             uid = int(request.GET.get('uid', 0))
             user = User.objects.get(pk=uid)
             info['user'] = user
+        except ObjectDoesNotExist:
+            arr_error.append('记录不存在')
         except Exception as e:
             arr_error.append(str(e))
     if arr_error:
-        info['error'] = json.dumps(arr_error)
+        info['error'] = json.dumps(arr_error, ensure_ascii=False)
     tpl_name = 'user/edit_user.html'
     return render(request, tpl_name, info)
 

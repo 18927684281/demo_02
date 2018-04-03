@@ -22,16 +22,23 @@
         <hr>
     {% endif %}
 
-    <div>
-        <label>权限：</label>
+    {% if all_perms %}
         <div>
-            {% for perm in all_perms %}
-                <input name='perm_id' type='checkbox' value='{{ perm.id }}' {% if perm in perms %} checked {% endif %} >
-                {{ perm.id }} - {{ perm.name }}
-                <br>
-            {% endfor %}
+            <label>权限：</label>
+            <div>
+                {% for perm in all_perms %}
+                    <input name='perm_id' type='checkbox'
+                            value='{{ perm.id }}'
+                            {% if perm in perms %}
+                                checked
+                            {% endif %}
+                            >
+                    {{ perm.id }} - {{ perm.name }}
+                    <br>
+                {% endfor %}
+            </div>
         </div>
-    </div>
+    {% endif %}
 
     <div>
         <button type="subit">提交</button>
