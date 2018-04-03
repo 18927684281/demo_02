@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block container %}
+<form method='POST' action='/user/del_permission/'>
+    {% csrf_token %}
+
+    {% if error %}
+        <div>
+            错误：{{ error }}
+        </div>
+        <hr>
+    {% endif %}
+
+    <div>
+        <label>权限：</label>
+        <div>
+            {% for perm in perms %}
+                <input name='perm_id' type='checkbox' value='{{ perm.id }}'>
+                {{ perm.id }} - {{ perm.name }}
+                <br>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div>
+        <button type="subit">提交</button>
+    </div>
+</form>
+{% endblock %}

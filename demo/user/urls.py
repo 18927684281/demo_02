@@ -21,4 +21,9 @@ urlpatterns = [
     path(r'del_user_perm/', views.del_user_perm),
 
     # 权限
+    path(r'add_permission/', views.add_permission),
+    path(r'read_permission/', views.read_permission),
+    path(r'list_permission/', views.list_permission),
+    path(r'edit_permission/', views.edit_permission),
+    path(r'del_permission/', views.del_permission),
 ]
