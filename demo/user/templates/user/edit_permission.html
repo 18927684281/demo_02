@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+{% block container %}
+<form method='POST' action='/user/edit_permission/'>
+    {% csrf_token %}
+
+    {% if error %}
+        <div>
+            错误：{{ error }}
+        </div>
+        <hr>
+    {% endif %}
+
+    {% if perm %}
+        <div>
+            <label>id：</label>
+            {{ perm.id }}
+            <input name='perm_id' type='hidden' value='{{ perm.id }}'>
+        </div>
+        <div>
+            <label>名称：</label>
+            <input name='name' type='text' value='{{ perm.name }}'>
+        </div>
+    {% endif %}
+
+    <div>
+        <button type='submit'>提交</button>
+    </div>
+</form>
+{% endblock %}

@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+
+{% block container %}
+<form method='POST' action='/user/add_permission/'>
+    {% csrf_token %}
+
+    {% if error %}
+        <div>
+            错误：{{ error }}
+        </div>
+        <hr>
+    {% endif %}
+    <div>
+        <label>名称</label>
+        <input name='name' type='text' value='{{ name }}'>
+    </div>
+
+    <div>
+        <button type="submit">提交</button>
+    </div>
+</form>
+{% endblock %}
