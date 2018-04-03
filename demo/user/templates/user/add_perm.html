@@ -11,24 +11,26 @@
         <hr>
     {% endif %}
 
-    <div>
-        <label>用户：</label>
-        {% for user in users %}
+    {% if user %}
+        <div>
+            <label>用户：</label>
             <div>
-                <input name='uid' type='radio' value='{{ user.id }}'>
+                <input name='uid' type='hidden' value='{{ user.id }}' selected>
                 {{ user.id }} - {{ user.nickname }}
             </div>
-        {% endfor %}
-    </div>
+        </div>
+        <hr>
+    {% endif %}
 
     <div>
         <label>权限：</label>
-        {% for perm in perms %}
-            <div>
-                <input name='perm_id' type='radio' value='{{ perm.id }}'>
+        <div>
+            {% for perm in all_perms %}
+                <input name='perm_id' type='checkbox' value='{{ perm.id }}' {% if perm in perms %} checked {% endif %} >
                 {{ perm.id }} - {{ perm.name }}
-            </div>
-        {% endfor %}
+                <br>
+            {% endfor %}
+        </div>
     </div>
 
     <div>

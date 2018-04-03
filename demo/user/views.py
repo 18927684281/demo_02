@@ -1,5 +1,5 @@
 from collections import defaultdict
-import pprint
+import json
 
 from django.shortcuts import render, redirect
 # from django.core.exceptions import ObjectDoesNotExist
@@ -96,24 +96,37 @@ def logout(request):
 def add_perm(request):
     ''' 增加权限 '''
     info = {}
-    if request.method == 'POST':
-        # 用户提交
-        try:
+    arr_error = []
+    try:
+        if request.method == 'POST':
+            # 用户提交
             uid = int(request.POST.get('uid', 0))
-            perm_id = int(request.POST.get('perm_id', 0))
-            user = User.objects.get(pk=uid)
-            perm = Permission.objects.get(pk=perm_id)
-            user.add_perm(perm.name)
-            url = '/user/list_perm/?uid={}'.format(uid)
-            return redirect(url)
-        except Exception as e:
-            info['error'] = str(e)
+            s_id_perm = request.POST.getlist('perm_id')
+            arr_id_perm = [int(s) for s in s_id_perm]
+            for perm_id in arr_id_perm:
+                Role.objects.get_or_create(uid=uid, perm_id=perm_id)
+            return redirect('/user/list_perm/?uid={}'.format(uid))
+    except Exception as e:
+        arr_error.append(str(e))
     # 显示"增加权限"的界面
+    try:
+        uid = int(request.GET.get('uid', 0))
+        user = User.objects.get(pk=uid)
+        arr_role_id = Role.objects.filter(uid=uid).values_list(
+                'perm_id', flat=True,
+                )
+        perms = Permission.objects.filter(id__in=arr_role_id).all()
+        if 'user' not in info:
+            info['user'] = user
+        if 'perms' not in info:
+            info['perms'] = perms
+        if 'all_perms' not in info:
+            info['all_perms'] = Permission.objects.all()
+    except Exception as e:
+        arr_error.append(str(e))
+    if arr_error:
+        info['error'] = json.dumps(arr_error)
     tpl_name = 'user/add_perm.html'
-    if 'users' not in info:
-        info['users'] = User.objects.all()
-    if 'perms' not in info:
-        info['perms'] = Permission.objects.all()
     return render(request, tpl_name, info)
 
 
@@ -129,7 +142,7 @@ def list_perm(request):
     if user:
         info['user'] = user
         arr_id_perm = tuple(
-                Role.objects.filter(uid=user.id).values_list(flat=True)
+                Role.objects.filter(uid=uid).values_list('perm_id', flat=True)
                 )
         perms = Permission.objects.filter(id__in=arr_id_perm).all()
         info['perms'] = perms
@@ -141,19 +154,24 @@ def list_perm(request):
 def del_perm(request):
     ''' 删除权限 '''
     info = {}
+    arr_error = []
+    try:
+        if request.method == 'POST':
+            # 用户提交
+            uid = int(request.POST.get('uid', 0))
+            s_id_perm = request.POST.getlist('perm_id')
+            arr_id_perm = [int(s) for s in s_id_perm]
+            Role.objects.filter(uid=uid, perm_id__in=arr_id_perm).delete()
+            return redirect('/user/list_perm/?uid={}'.format(uid))
+    except Exception as e:
+        arr_error.append(str(e))
     try:
         uid = int(request.GET.get('uid', 0))
         user = User.objects.get(pk=uid)
-        if request.method == 'POST':
-            # 用户提交
-            pass
-
         arr_role_id = Role.objects.filter(uid=uid).values_list(
                 'perm_id', flat=True,
                 )
-        print('arr_role_id: {}'.format(arr_role_id))
         perms = Permission.objects.filter(id__in=arr_role_id).all()
-        print('perms: {}'.format(perms))
         if 'user' not in info:
             info['user'] = user
         if 'perms' not in info:
@@ -161,8 +179,8 @@ def del_perm(request):
         if 'all_perms' not in info:
             info['all_perms'] = Permission.objects.all()
     except Exception as e:
-        info['error'] = str(e)
+        arr_error.append(str(e))
+    if arr_error:
+        info['error'] = json.dumps(arr_error)
     tpl_name = 'user/del_perm.html'
-    print('info:')
-    pprint.pprint(info)
     return render(request, tpl_name, info)
