@@ -29,20 +29,20 @@ class User(models.Model):
             perm = Permission.objects.get(name=perm_name)
         except User.DoesNotExist as e:
             return e
-        Role.objects.get_or_create(uid=self.id, perm_id=perm.id)
+        UserPermission.objects.get_or_create(uid=self.id, perm_id=perm.id)
 
     def del_perm(self, perm_name):
         ''' 删除权限 '''
         try:
             perm = Permission.objects.get(name=perm_name)
-            Role.objects.get(uid=self.id, perm_id=perm.id).delete()
+            UserPermission.objects.get(uid=self.id, perm_id=perm.id).delete()
         except ObjectDoesNotExist as e:
             print(e)
 
     def has_perm(self, perm_name):
         ''' 检查权限 '''
         perm = Permission.objects.get(name=perm_name)
-        flag = Role.objects.filter(uid=self.id, perm_id=perm.id)
+        flag = UserPermission.objects.filter(uid=self.id, perm_id=perm.id)
         return flag
 
 
@@ -56,8 +56,8 @@ class Permission(models.Model):
         return self.name
 
 
-class Role(models.Model):
-    ''' 角色 '''
+class UserPermission(models.Model):
+    ''' 用户--权限 关联表 '''
     uid = models.IntegerField()
     perm_id = models.IntegerField()
 
