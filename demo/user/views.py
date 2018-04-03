@@ -43,7 +43,7 @@ def register_user(request):
         request.session['nickname'] = user.nickname
 
         # 跳转到用户信息
-        url = '/user/info/?uid={}'.format(user.id)
+        url = '/user/read_user/?uid={}'.format(user.id)
         return redirect(url)
     else:
         # 显示注册页面
@@ -53,12 +53,16 @@ def register_user(request):
 
 
 # @check_perm('admin')
-def info_user(request):
+def read_user(request):
     ''' 显示用户信息 '''
-    uid = request.session['uid']
-    user = User.objects.get(pk=uid)
-    info = {'user': user}
-    tpl_name = 'user/info.html'
+    info = {'user': None}
+    uid = int(request.GET.get('uid', 0))
+    try:
+        user = User.objects.get(pk=uid)
+        info['user'] = user
+    except Exception:
+        info['error'] = '用户不存在'
+    tpl_name = 'user/read_user.html'
     return render(request, tpl_name, info)
 
 
@@ -79,7 +83,7 @@ def login(request):
         else:
             request.session['uid'] = user.id
             request.session['nickname'] = user.nickname
-            url = '/user/info/?uid={}'.format(user.id)
+            url = '/user/read_user/?uid={}'.format(user.id)
             return redirect(url)
     tpl_name = 'user/login.html'
     return render(request, tpl_name, info)
@@ -184,3 +188,8 @@ def del_perm(request):
         info['error'] = json.dumps(arr_error)
     tpl_name = 'user/del_perm.html'
     return render(request, tpl_name, info)
+
+
+def edit_user(request):
+    ''' 修改用户信息 '''
+    pass
