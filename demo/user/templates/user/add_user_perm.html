@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {% block container %}
-<form method='POST' action='/user/add_perm/'>
+<form method='POST' action='/user/add_user_perm/'>
     {% csrf_token %}
 
     {% if error %}
