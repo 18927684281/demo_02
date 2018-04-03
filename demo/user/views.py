@@ -155,6 +155,7 @@ def del_perm(request):
     ''' 删除权限 '''
     info = {}
     arr_error = []
+    uid = None
     try:
         if request.method == 'POST':
             # 用户提交
@@ -166,7 +167,8 @@ def del_perm(request):
     except Exception as e:
         arr_error.append(str(e))
     try:
-        uid = int(request.GET.get('uid', 0))
+        if uid is None:
+            uid = int(request.GET.get('uid', 0))
         user = User.objects.get(pk=uid)
         arr_role_id = Role.objects.filter(uid=uid).values_list(
                 'perm_id', flat=True,
@@ -227,4 +229,25 @@ def list_user(request):
     tpl_name = 'user/list_user.html'
     users = User.objects.all()
     info = {'users': users}
+    return render(request, tpl_name, info)
+
+
+def del_user(request):
+    ''' 用户删除 '''
+    info = {}
+    arr_error = []
+    try:
+        if request.method == 'POST':
+            # 用户提交
+            uid = int(request.POST.get('uid', 0))
+            User.objects.get(pk=uid).delete()
+            return redirect('/user/list_user/')
+    except Exception as e:
+        arr_error.append(str(e))
+    users = User.objects.all()
+    if 'users' not in info:
+        info['users'] = users
+    if arr_error:
+        info['error'] = json.dumps(arr_error)
+    tpl_name = 'user/del_user.html'
     return render(request, tpl_name, info)
